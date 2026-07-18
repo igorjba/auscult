@@ -14,6 +14,7 @@ import { SeverityPanel } from "./SeverityPanel";
 import { BearingPanel } from "./BearingPanel";
 import { SpectrumChart, type Marker } from "./SpectrumChart";
 import { WaterfallChart } from "./WaterfallChart";
+import { InfoTip } from "./InfoTip";
 import a from "./app.module.css";
 
 export function AnalyzerApp() {
@@ -153,7 +154,10 @@ export function AnalyzerApp() {
 
               <div className={a.chartPanel}>
                 <div className={a.chartHead}>
-                  <span className={a.chartTitle}>Espectro — {request.unit === "acceleration" ? "velocidade integrada" : "velocidade"}</span>
+                  <span className={a.headGroup}>
+                    <span className={a.chartTitle}>Espectro — {request.unit === "acceleration" ? "velocidade integrada" : "velocidade"}</span>
+                    <InfoTip text="Decompoe a vibracao nas frequencias que a formam — como separar as notas de um acorde. Picos em multiplos da rotacao (1x, 2x, 3x…) apontam desbalanceamento, desalinhamento ou folga. Passe o mouse no grafico para ler cada ponto." />
+                  </span>
                   <span className={a.chartSub}>
                     1× = {shaftRate.toFixed(2)} Hz · Δf = {result.velocitySpectrum.freqResolution.toFixed(2)} Hz
                   </span>
@@ -176,7 +180,10 @@ export function AnalyzerApp() {
 
               <div className={a.chartPanel}>
                 <div className={a.chartHead}>
-                  <span className={a.chartTitle}>Espectro de envelope (demodulacao Hilbert)</span>
+                  <span className={a.headGroup}>
+                    <span className={a.chartTitle}>Espectro de envelope (demodulacao Hilbert)</span>
+                    <InfoTip text="Revela batidas repetitivas fracas escondidas na vibracao de alta frequencia — o jeito de flagrar um rolamento comecando a falhar, antes de piorar. As linhas coloridas marcam onde cada tipo de defeito (BPFO/BPFI/BSF/FTF) apareceria." />
+                  </span>
                   <span className={a.chartSub}>
                     banda {result.resonanceBand[0].toFixed(0)}–{result.resonanceBand[1].toFixed(0)} Hz
                   </span>
@@ -208,7 +215,10 @@ export function AnalyzerApp() {
               {waterfall && waterfall.magnitudes.length > 1 && (
                 <div className={a.chartPanel}>
                   <div className={a.chartHead}>
-                    <span className={a.chartTitle}>Waterfall (STFT)</span>
+                    <span className={a.headGroup}>
+                      <span className={a.chartTitle}>Waterfall (STFT)</span>
+                      <InfoTip text="Mostra como as frequencias da vibracao evoluem ao longo do tempo: o eixo horizontal e a frequencia, o vertical e o tempo, e as cores quentes indicam mais energia. Util para partidas e paradas, onde a rotacao varia." />
+                    </span>
                     <span className={a.chartSub}>{waterfall.magnitudes.length} quadros</span>
                   </div>
                   <WaterfallChart waterfall={waterfall} theme={theme} />

@@ -89,6 +89,11 @@
   font-size: 13px;
   font-weight: 600;
 }
+.headGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
 .chartSub {
   font-family: var(--font-mono);
   font-size: 11px;

@@ -12,6 +12,11 @@
   justify-content: space-between;
   margin-bottom: 14px;
 }
+.headGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
 
 .title {
   font-size: 13px;

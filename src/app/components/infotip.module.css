@@ -1,0 +1,72 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.trigger {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg-inset);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: help;
+  padding: 0;
+  transition: color 0.12s, border-color 0.12s;
+}
+.trigger:hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+.bubble {
+  position: absolute;
+  top: calc(100% + 7px);
+  z-index: 60;
+  width: max-content;
+  max-width: 250px;
+  padding: 8px 11px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-dim);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-3px);
+  transition: opacity 0.13s ease, transform 0.13s ease, visibility 0.13s;
+  pointer-events: none;
+}
+
+.left {
+  left: -4px;
+}
+.right {
+  right: -4px;
+}
+.center {
+  left: 50%;
+  transform: translate(-50%, -3px);
+}
+
+.wrap:hover .bubble,
+.trigger:focus-visible + .bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.trigger:focus-visible + .center {
+  transform: translate(-50%, 0);
+}

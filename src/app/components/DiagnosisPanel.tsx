@@ -2,7 +2,20 @@
 
 import type { DiagnosisResult } from "@/core/diagnosis/rules";
 import { FAULT_LABELS } from "@/core/signal/generator";
+import { InfoTip } from "./InfoTip";
 import s from "./panels.module.css";
+
+const FAULT_HELP: Record<string, string> = {
+  healthy: "Nenhum defeito claro: a maquina vibra dentro do normal.",
+  unbalance: "Desbalanceamento: massa mal distribuida no rotor. Costuma vibrar forte na frequencia de rotacao (1x).",
+  misalignment: "Desalinhamento: eixos acoplados fora de linha. Marca forte em 2x a rotacao.",
+  looseness: "Folga mecanica: pecas soltas ou base frouxa. Gera muitas harmonicas da rotacao.",
+  bearing_outer: "Defeito na pista externa (fixa) do rolamento.",
+  bearing_inner: "Defeito na pista interna (gira com o eixo) do rolamento.",
+  bearing_ball: "Defeito em uma esfera/rolo do rolamento.",
+  cavitation: "Cavitacao: bolhas colapsando em bombas. Ruido espalhado em banda larga, sem uma frequencia unica.",
+  oil_whirl: "Whirl de oleo: instabilidade do filme de oleo em mancais de deslizamento. Vibra abaixo da rotacao (~0,45x).",
+};
 
 const FAULT_COLOR: Record<string, string> = {
   healthy: "var(--zone-a)",
@@ -26,7 +39,10 @@ export function DiagnosisPanel({ diagnosis }: { diagnosis: DiagnosisResult }) {
   return (
     <div className={s.panel}>
       <div className={s.header}>
-        <span className="eyebrow">Diagnostico</span>
+        <span className={s.headGroup}>
+          <span className="eyebrow">Diagnostico</span>
+          <InfoTip text="A conclusao do app sobre o que esta acontecendo na maquina, com o quanto ele confia. Abaixo, as outras hipoteses e as evidencias que sustentam a principal." />
+        </span>
         <span className={s.confidence}>{confidence}</span>
       </div>
 
@@ -34,6 +50,7 @@ export function DiagnosisPanel({ diagnosis }: { diagnosis: DiagnosisResult }) {
         <span className={s.verdictName} style={{ color }}>
           {FAULT_LABELS[top.fault]}
         </span>
+        <InfoTip text={FAULT_HELP[top.fault] ?? ""} align="center" />
         <span className={s.verdictScore} style={{ color }}>
           {Math.round(top.score * 100)}%
         </span>

@@ -9,6 +9,7 @@ import { WINDOW_LABELS, type WindowType } from "@/core/dsp";
 import { CWRU_CASES } from "@/core/validation/cwru";
 import { assertFileSize, assertSampleCount } from "@/lib/limits";
 import type { AnalysisRequest } from "@/lib/types";
+import { InfoTip } from "./InfoTip";
 import s from "./controls.module.css";
 
 type SourceMode = "synthetic" | "file" | "cwru";
@@ -168,8 +169,13 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
 
       {mode === "synthetic" && (
         <div className={s.grid1}>
+          <p className={s.lead}>
+            Cria um sinal de vibracao com o defeito escolhido e diagnostica na hora — ideal para experimentar sem precisar de um arquivo real.
+          </p>
           <label className="field">
-            <span>Falha injetada</span>
+            <span>
+              Falha injetada <InfoTip text="Escolha um defeito para simular. O app cria um sinal de vibracao com ele e tenta diagnosticar — util para ver como cada falha se manifesta." />
+            </span>
             <select className="select" value={fault} onChange={(e) => setFault(e.target.value as FaultType)}>
               {GEN_FAULTS.map((f) => (
                 <option key={f} value={f}>
@@ -185,7 +191,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
             </label>
             <div className={s.sliderRow}>
               <div className={s.sliderHead}>
-                <span>Severidade</span>
+                <span className={s.headGroup}>
+                  Severidade <InfoTip text="O quao grave e o defeito simulado. Mais alto = vibracao mais forte e mais facil de detectar." align="center" />
+                </span>
                 <span className={s.sliderVal}>{severity.toFixed(2)}</span>
               </div>
               <input aria-label="Severidade" type="range" min={0.1} max={1} step={0.05} value={severity} onChange={(e) => setSeverity(Number(e.target.value))} />
@@ -193,7 +201,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
           </div>
           <div className={s.sliderRow}>
             <div className={s.sliderHead}>
-              <span>Ruido de fundo</span>
+              <span className={s.headGroup}>
+                Ruido de fundo <InfoTip text="Interferencia aleatoria somada ao sinal, como em uma medicao real. Mais alto = mais dificil de diagnosticar." />
+              </span>
               <span className={s.sliderVal}>{noise.toFixed(2)}</span>
             </div>
             <input aria-label="Ruido de fundo" type="range" min={0} max={0.3} step={0.01} value={noise} onChange={(e) => setNoise(Number(e.target.value))} />
@@ -257,7 +267,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
 
       <div className={s.grid1}>
         <label className="field">
-          <span>Rolamento</span>
+          <span>
+            Rolamento <InfoTip text="Modelo do rolamento analisado. Suas medidas definem as frequencias de defeito calculadas ao lado. Escolha 'Geometria personalizada' para informar as medidas de outro rolamento." />
+          </span>
           <select className="select" value={bearing} onChange={(e) => setBearing(e.target.value)}>
             {BEARING_CATALOG.map((b) => (
               <option key={b.designation} value={b.designation}>
@@ -320,7 +332,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
 
         <div className={s.grid2}>
           <label className="field">
-            <span>Janela FFT</span>
+            <span>
+              Janela FFT <InfoTip text="Ajuste tecnico da analise de frequencia. Hann serve para quase tudo; flat-top mede a altura dos picos com mais precisao." />
+            </span>
             <select className="select" value={windowType} onChange={(e) => setWindowType(e.target.value as WindowType)}>
               {(Object.keys(WINDOW_LABELS) as WindowType[]).map((w) => (
                 <option key={w} value={w}>
@@ -330,7 +344,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
             </select>
           </label>
           <label className="field">
-            <span>Grupo ISO</span>
+            <span>
+              Grupo ISO <InfoTip text="Porte da maquina, pela ISO 20816. Define os limites de vibracao aceitaveis (as faixas das zonas A–D)." />
+            </span>
             <select className="select" value={machineGroup} onChange={(e) => setMachineGroup(e.target.value as "group1" | "group2")}>
               <option value="group2">Grupo 2 (15–300 kW)</option>
               <option value="group1">Grupo 1 (&gt; 300 kW)</option>
@@ -339,7 +355,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
         </div>
         <div className={s.grid2}>
           <label className="field">
-            <span>Fundacao</span>
+            <span>
+              Fundacao <InfoTip text="Como a maquina esta montada. Base rigida tolera menos vibracao que base flexivel — muda os limites das zonas." />
+            </span>
             <select className="select" value={foundation} onChange={(e) => setFoundation(e.target.value as "rigid" | "flexible")}>
               <option value="rigid">Rigida</option>
               <option value="flexible">Flexivel</option>
