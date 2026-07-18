@@ -162,8 +162,8 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
 
       {mode === "synthetic" && (
         <div className={s.grid1}>
-          <div className="field">
-            <label>Falha injetada</label>
+          <label className="field">
+            <span>Falha injetada</span>
             <select className="select" value={fault} onChange={(e) => setFault(e.target.value as FaultType)}>
               {GEN_FAULTS.map((f) => (
                 <option key={f} value={f}>
@@ -171,18 +171,18 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
                 </option>
               ))}
             </select>
-          </div>
+          </label>
           <div className={s.grid2}>
-            <div className="field">
-              <label>Rotacao (RPM)</label>
+            <label className="field">
+              <span>Rotacao (RPM)</span>
               <input className="input" type="number" value={rpm} min={300} max={12000} step={1} onChange={(e) => setRpm(Number(e.target.value))} />
-            </div>
+            </label>
             <div className={s.sliderRow}>
               <div className={s.sliderHead}>
                 <span>Severidade</span>
                 <span className={s.sliderVal}>{severity.toFixed(2)}</span>
               </div>
-              <input type="range" min={0.1} max={1} step={0.05} value={severity} onChange={(e) => setSeverity(Number(e.target.value))} />
+              <input aria-label="Severidade" type="range" min={0.1} max={1} step={0.05} value={severity} onChange={(e) => setSeverity(Number(e.target.value))} />
             </div>
           </div>
           <div className={s.sliderRow}>
@@ -190,7 +190,7 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
               <span>Ruido de fundo</span>
               <span className={s.sliderVal}>{noise.toFixed(2)}</span>
             </div>
-            <input type="range" min={0} max={0.3} step={0.01} value={noise} onChange={(e) => setNoise(Number(e.target.value))} />
+            <input aria-label="Ruido de fundo" type="range" min={0} max={0.3} step={0.01} value={noise} onChange={(e) => setNoise(Number(e.target.value))} />
           </div>
           <button className="btn btn-primary" onClick={generate} disabled={busy}>
             {busy ? "Analisando…" : "Gerar e analisar"}
@@ -200,28 +200,28 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
 
       {mode === "file" && (
         <div className={s.grid1}>
-          <div className={s.dropzone} onClick={() => fileInput.current?.click()}>
+          <button type="button" className={s.dropzone} onClick={() => fileInput.current?.click()}>
             <strong>Carregar arquivo</strong>
-            <div className={s.hint}>WAV · CSV · MAT (Case Western)</div>
-          </div>
+            <span className={s.hint}>WAV · CSV · MAT (Case Western)</span>
+          </button>
           <input ref={fileInput} type="file" accept=".wav,.csv,.txt,.mat" hidden onChange={onFile} />
           <div className={s.grid2}>
-            <div className="field">
-              <label>Taxa de amostragem (Hz)</label>
+            <label className="field">
+              <span>Taxa de amostragem (Hz)</span>
               <input className="input" type="number" value={fileSampleRate} onChange={(e) => setFileSampleRate(Number(e.target.value))} />
-            </div>
-            <div className="field">
-              <label>Rotacao (RPM)</label>
+            </label>
+            <label className="field">
+              <span>Rotacao (RPM)</span>
               <input className="input" type="number" value={fileRpm} onChange={(e) => setFileRpm(Number(e.target.value))} />
-            </div>
+            </label>
           </div>
-          <div className="field">
-            <label>Grandeza do sinal</label>
+          <label className="field">
+            <span>Grandeza do sinal</span>
             <select className="select" value={fileUnit} onChange={(e) => setFileUnit(e.target.value as "acceleration" | "velocity")}>
               <option value="acceleration">Aceleracao (g)</option>
               <option value="velocity">Velocidade (mm/s)</option>
             </select>
-          </div>
+          </label>
           <div className={s.hint}>CSV: coluna de tempo detectada automaticamente; senao usa a taxa acima. MAT: canal drive-end e RPM lidos do arquivo.</div>
         </div>
       )}
@@ -250,8 +250,8 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
       <div className={s.divider} />
 
       <div className={s.grid1}>
-        <div className="field">
-          <label>Rolamento</label>
+        <label className="field">
+          <span>Rolamento</span>
           <select className="select" value={bearing} onChange={(e) => setBearing(e.target.value)}>
             {BEARING_CATALOG.map((b) => (
               <option key={b.designation} value={b.designation}>
@@ -260,12 +260,12 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
             ))}
             <option value="custom">— Geometria personalizada —</option>
           </select>
-        </div>
+        </label>
 
         {isCustom && (
           <div className={s.grid2}>
-            <div className="field">
-              <label>Elementos (Nb)</label>
+            <label className="field">
+              <span>Elementos (Nb)</span>
               <input
                 className="input"
                 type="number"
@@ -274,9 +274,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
                 value={customGeo.rollingElements}
                 onChange={(e) => setCustomGeo({ ...customGeo, rollingElements: Number(e.target.value) })}
               />
-            </div>
-            <div className="field">
-              <label>Ang. contato (°)</label>
+            </label>
+            <label className="field">
+              <span>Ang. contato (°)</span>
               <input
                 className="input"
                 type="number"
@@ -286,9 +286,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
                 value={Math.round((customGeo.contactAngle * 180) / Math.PI)}
                 onChange={(e) => setCustomGeo({ ...customGeo, contactAngle: (Number(e.target.value) * Math.PI) / 180 })}
               />
-            </div>
-            <div className="field">
-              <label>Diam. esfera (mm)</label>
+            </label>
+            <label className="field">
+              <span>Diam. esfera (mm)</span>
               <input
                 className="input"
                 type="number"
@@ -297,9 +297,9 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
                 value={customGeo.ballDiameter}
                 onChange={(e) => setCustomGeo({ ...customGeo, ballDiameter: Number(e.target.value) })}
               />
-            </div>
-            <div className="field">
-              <label>Diam. primitivo (mm)</label>
+            </label>
+            <label className="field">
+              <span>Diam. primitivo (mm)</span>
               <input
                 className="input"
                 type="number"
@@ -308,13 +308,13 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
                 value={customGeo.pitchDiameter}
                 onChange={(e) => setCustomGeo({ ...customGeo, pitchDiameter: Number(e.target.value) })}
               />
-            </div>
+            </label>
           </div>
         )}
 
         <div className={s.grid2}>
-          <div className="field">
-            <label>Janela FFT</label>
+          <label className="field">
+            <span>Janela FFT</span>
             <select className="select" value={windowType} onChange={(e) => setWindowType(e.target.value as WindowType)}>
               {(Object.keys(WINDOW_LABELS) as WindowType[]).map((w) => (
                 <option key={w} value={w}>
@@ -322,30 +322,38 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="field">
-            <label>Grupo ISO</label>
+          </label>
+          <label className="field">
+            <span>Grupo ISO</span>
             <select className="select" value={machineGroup} onChange={(e) => setMachineGroup(e.target.value as "group1" | "group2")}>
               <option value="group2">Grupo 2 (15–300 kW)</option>
               <option value="group1">Grupo 1 (&gt; 300 kW)</option>
             </select>
-          </div>
+          </label>
         </div>
         <div className={s.grid2}>
-          <div className="field">
-            <label>Fundacao</label>
+          <label className="field">
+            <span>Fundacao</span>
             <select className="select" value={foundation} onChange={(e) => setFoundation(e.target.value as "rigid" | "flexible")}>
               <option value="rigid">Rigida</option>
               <option value="flexible">Flexivel</option>
             </select>
-          </div>
-          <label className="field" style={{ justifyContent: "flex-end", cursor: "pointer" }}>
-            <label>Cascata / waterfall</label>
-            <button className="btn btn-sm" onClick={() => setWaterfall((w) => !w)} style={{ justifyContent: "space-between" }}>
-              <span>{waterfall ? "Ativado" : "Desativado"}</span>
-              <span style={{ color: waterfall ? "var(--accent)" : "var(--text-faint)" }}>●</span>
-            </button>
           </label>
+          <div className="field">
+            <span>Cascata / waterfall</span>
+            <button
+              type="button"
+              className="btn btn-sm"
+              aria-pressed={waterfall}
+              onClick={() => setWaterfall((w) => !w)}
+              style={{ justifyContent: "space-between" }}
+            >
+              <span>{waterfall ? "Ativado" : "Desativado"}</span>
+              <span aria-hidden style={{ color: waterfall ? "var(--accent)" : "var(--text-faint)" }}>
+                ●
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -11,8 +11,8 @@
   --line-soft: #1a222b;
 
   --text: #d3dce6;
-  --text-dim: #8494a3;
-  --text-faint: #5a6875;
+  --text-dim: #97a5b3;
+  --text-faint: #7c8a98; /* meets WCAG AA (>=4.5:1) on the dark surfaces */
 
   --accent: #38d6b0; /* phosphor teal */
   --accent-dim: #1f7d69;
@@ -187,7 +187,10 @@ a:hover {
   flex-direction: column;
   gap: 5px;
 }
-.field > label {
+/* `.field` is a <label> wrapping its control; the caption is a <span> so the
+   association is implicit (no id/htmlFor bookkeeping) and the control gets an
+   accessible name for free. */
+.field > span {
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.1em;

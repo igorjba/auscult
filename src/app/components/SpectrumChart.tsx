@@ -89,7 +89,7 @@ export function SpectrumChart({
 
     // Grid.
     ctx.strokeStyle = "rgba(255,255,255,0.05)";
-    ctx.fillStyle = "#5a6875";
+    ctx.fillStyle = "#8a97a5";
     ctx.lineWidth = 1;
     ctx.font = "10px var(--font-geist-mono), monospace";
     ctx.textAlign = "center";

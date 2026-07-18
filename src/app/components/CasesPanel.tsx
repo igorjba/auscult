@@ -65,14 +65,12 @@ export function CasesPanel({ current, result, onLoad }: Props) {
     });
   }
 
-  async function remove(id: string, e: React.MouseEvent) {
-    e.stopPropagation();
+  async function remove(id: string) {
     await deleteCase(id);
     refresh();
   }
 
-  function download(c: StoredCase, e: React.MouseEvent) {
-    e.stopPropagation();
+  function download(c: StoredCase) {
     const blob = new Blob([exportCase(c)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -107,12 +105,13 @@ export function CasesPanel({ current, result, onLoad }: Props) {
       <div className={s.saveRow}>
         <input
           className="input"
+          aria-label="Nome do caso a salvar"
           placeholder={current ? "Nome do caso…" : "Analise um sinal primeiro"}
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={!current}
         />
-        <button className="btn btn-sm" onClick={save} disabled={!current || !result}>
+        <button type="button" className="btn btn-sm" onClick={save} disabled={!current || !result}>
           Salvar
         </button>
       </div>
@@ -120,30 +119,30 @@ export function CasesPanel({ current, result, onLoad }: Props) {
       {cases.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 12 }}>
           {cases.map((c) => (
-            <button key={c.id} className={s.cwruCard} onClick={() => load(c)} style={{ display: "block" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                <span className={s.cwruLabel} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <div key={c.id} className={s.caseRow}>
+              <button type="button" className={s.caseLoad} onClick={() => load(c)}>
+                <span className={s.cwruLabel} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>
                   {c.name}
                 </span>
-                <span style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                  <span className={s.cwruId} onClick={(e) => download(c, e)} style={{ cursor: "pointer" }} title="Exportar JSON">
-                    ↓
-                  </span>
-                  <span className={s.cwruId} onClick={(e) => remove(c.id, e)} style={{ cursor: "pointer" }} title="Excluir">
-                    ✕
-                  </span>
+                <span className={s.cwruMeta}>
+                  {FAULT_LABELS[c.diagnosis.fault]} · zona {c.diagnosis.zone} · {c.diagnosis.velocityRms.toFixed(2)} mm/s
                 </span>
+              </button>
+              <div className={s.caseActions}>
+                <button type="button" className={s.iconBtn} aria-label={`Exportar ${c.name} em JSON`} title="Exportar JSON" onClick={() => download(c)}>
+                  ↓
+                </button>
+                <button type="button" className={s.iconBtn} aria-label={`Excluir ${c.name}`} title="Excluir" onClick={() => remove(c.id)}>
+                  ✕
+                </button>
               </div>
-              <div className={s.cwruMeta}>
-                {FAULT_LABELS[c.diagnosis.fault]} · zona {c.diagnosis.zone} · {c.diagnosis.velocityRms.toFixed(2)} mm/s
-              </div>
-            </button>
+            </div>
           ))}
         </div>
       )}
 
       <div style={{ marginTop: 10 }}>
-        <button className="btn btn-sm" style={{ width: "100%" }} onClick={() => importInput.current?.click()}>
+        <button type="button" className="btn btn-sm" style={{ width: "100%" }} onClick={() => importInput.current?.click()}>
           Importar caso (JSON)
         </button>
         <input ref={importInput} type="file" accept=".json" hidden onChange={onImport} />

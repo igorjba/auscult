@@ -102,13 +102,20 @@
 }
 
 .dropzone {
+  width: 100%;
+  display: block;
   border: 1.5px dashed var(--line);
   border-radius: var(--radius);
   padding: 22px 14px;
   text-align: center;
+  background: transparent;
   color: var(--text-dim);
   cursor: pointer;
   transition: border-color 0.12s, background 0.12s;
+}
+.dropzone strong {
+  display: block;
+  color: var(--text);
 }
 .dropzone:hover {
   border-color: var(--accent-dim);
@@ -131,4 +138,48 @@
   border: 1px solid rgba(224, 82, 95, 0.3);
   color: #f2a3aa;
   font-size: 12.5px;
+}
+
+.caseRow {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.caseLoad {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--bg-inset);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.caseLoad:hover {
+  border-color: var(--accent-dim);
+  background: #131c22;
+}
+.caseActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.iconBtn {
+  width: 30px;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--bg-inset);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+.iconBtn:hover {
+  border-color: #33414e;
+  background: #182029;
+  color: var(--text);
 }

@@ -78,7 +78,7 @@ export function WaterfallChart({ waterfall, height = 240, markers = [] }: Props)
     ctx.drawImage(off, padL, padT, plotW, plotH);
 
     // Axes.
-    ctx.fillStyle = "#5a6875";
+    ctx.fillStyle = "#8a97a5";
     ctx.font = "10px var(--font-geist-mono), monospace";
     ctx.textAlign = "center";
     for (let t = 0; t <= 6; t++) {
