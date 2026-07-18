@@ -43,7 +43,7 @@
   display: flex;
   gap: 12px;
   padding: 4px 10px;
-  background: rgba(8, 12, 16, 0.85);
+  background: var(--readout-bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   font-size: 12px;

@@ -1,8 +1,71 @@
 /* auscult — instrument-panel design system.
-   Dark by intent: this reads like bench DSP software (a scope, a DAW analyser),
-   not a generic dashboard. Data is monospaced; structure is set on a precise grid. */
+   Reads like bench DSP software (a scope, a DAW analyser), not a generic dashboard.
+   Data is monospaced; structure sits on a precise grid. Two themes share one set of
+   semantic tokens; light is the default, dark is opted into via [data-theme]. */
 
 :root {
+  /* --- Light (default) --- */
+  --bg: #e9edf2;
+  --bg-panel: #ffffff;
+  --bg-panel-2: #f8fafc;
+  --bg-inset: #eef2f6;
+  --line: #d6dce3;
+  --line-soft: #e4e9ee;
+
+  --text: #16202e;
+  --text-dim: #4e5a68;
+  --text-faint: #5f6b79; /* WCAG AA (>=4.5:1) on the light surfaces */
+
+  --accent: #0a8367; /* teal, dark enough to read as text on white */
+  --accent-dim: #7dc4b4;
+  --amber: #8a5a0c; /* dark enough for AA text on the light inset */
+  --violet: #6d4fb8;
+
+  --zone-a: #167a3c;
+  --zone-b: #4a7328;
+  --zone-c: #986410;
+  --zone-d: #c11f2b;
+  --bpfi: #c11f2b;
+
+  --grid: rgba(20, 30, 45, 0.06);
+  --grid-strong: rgba(20, 30, 45, 0.1);
+  --crosshair: rgba(20, 30, 45, 0.42);
+
+  --surface-hover: #eef2f6;
+  --border-hover: #c2cad4;
+  --input-hover-border: #b8c0cb;
+  --scrollbar-hover: #c2cad4;
+
+  --primary-1: #12a082;
+  --primary-2: #0a8367;
+  --primary-hover-1: #0e9478;
+  --primary-hover-2: #086b54;
+  --primary-text: #ffffff;
+
+  --readout-bg: rgba(255, 255, 255, 0.9);
+  --error-bg: rgba(207, 59, 71, 0.08);
+  --error-border: rgba(207, 59, 71, 0.32);
+  --error-text: #b02531;
+  --ev-yes-bg: rgba(46, 158, 86, 0.14);
+  --ev-no-bg: rgba(95, 107, 121, 0.12);
+  --truth-ok-bg: rgba(46, 158, 86, 0.12);
+  --truth-ok-border: rgba(46, 158, 86, 0.42);
+  --truth-miss-bg: rgba(207, 59, 71, 0.1);
+  --truth-miss-border: rgba(207, 59, 71, 0.42);
+
+  --glow-1: rgba(10, 131, 103, 0.07);
+  --glow-2: rgba(109, 79, 184, 0.05);
+  --shadow: 0 1px 2px rgba(30, 40, 60, 0.06), 0 10px 26px rgba(30, 40, 60, 0.09);
+
+  --radius: 6px;
+  --radius-lg: 10px;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
   --bg: #0a0d11;
   --bg-panel: #10151b;
   --bg-panel-2: #141b23;
@@ -12,7 +75,7 @@
 
   --text: #d3dce6;
   --text-dim: #97a5b3;
-  --text-faint: #7c8a98; /* meets WCAG AA (>=4.5:1) on the dark surfaces */
+  --text-faint: #7c8a98;
 
   --accent: #38d6b0; /* phosphor teal */
   --accent-dim: #1f7d69;
@@ -23,17 +86,39 @@
   --zone-b: #8bc34a;
   --zone-c: #e5a94e;
   --zone-d: #e0525f;
+  --bpfi: #ff7a85;
 
-  --grid: rgba(255, 255, 255, 0.04);
+  --grid: rgba(255, 255, 255, 0.05);
   --grid-strong: rgba(255, 255, 255, 0.08);
+  --crosshair: rgba(255, 255, 255, 0.35);
 
-  --radius: 6px;
-  --radius-lg: 10px;
+  --surface-hover: #182029;
+  --border-hover: #33414e;
+  --input-hover-border: #2c3742;
+  --scrollbar-hover: #2c3742;
 
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+  --primary-1: #2ec5a1;
+  --primary-2: #1f9b7f;
+  --primary-hover-1: #37d6b0;
+  --primary-hover-2: #23a488;
+  --primary-text: #04120e;
 
+  --readout-bg: rgba(8, 12, 16, 0.85);
+  --error-bg: rgba(224, 82, 95, 0.12);
+  --error-border: rgba(224, 82, 95, 0.3);
+  --error-text: #f2a3aa;
+  --ev-yes-bg: rgba(63, 183, 104, 0.15);
+  --ev-no-bg: rgba(90, 104, 117, 0.15);
+  --truth-ok-bg: rgba(63, 183, 104, 0.1);
+  --truth-ok-border: rgba(63, 183, 104, 0.4);
+  --truth-miss-bg: rgba(224, 82, 95, 0.1);
+  --truth-miss-border: rgba(224, 82, 95, 0.4);
+
+  --glow-1: rgba(56, 214, 176, 0.05);
+  --glow-2: rgba(169, 139, 224, 0.04);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.25);
+
+  color-scheme: dark;
 }
 
 * {
@@ -55,8 +140,8 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   background-image:
-    radial-gradient(1200px 600px at 80% -10%, rgba(56, 214, 176, 0.05), transparent),
-    radial-gradient(900px 500px at 0% 0%, rgba(169, 139, 224, 0.04), transparent);
+    radial-gradient(1200px 600px at 80% -10%, var(--glow-1), transparent),
+    radial-gradient(900px 500px at 0% 0%, var(--glow-2), transparent);
   background-attachment: fixed;
   min-height: 100vh;
 }
@@ -132,7 +217,7 @@ a:hover {
   border: 2px solid var(--bg);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2c3742;
+  background: var(--scrollbar-hover);
 }
 
 :focus-visible {
@@ -157,8 +242,8 @@ a:hover {
   transition: border-color 0.12s, background 0.12s, transform 0.05s;
 }
 .btn:hover {
-  border-color: #33414e;
-  background: #182029;
+  border-color: var(--border-hover);
+  background: var(--surface-hover);
 }
 .btn:active {
   transform: translateY(1px);
@@ -168,14 +253,14 @@ a:hover {
   cursor: not-allowed;
 }
 .btn-primary {
-  background: linear-gradient(180deg, #2ec5a1, #1f9b7f);
-  border-color: #2ec5a1;
-  color: #04120e;
+  background: linear-gradient(180deg, var(--primary-1), var(--primary-2));
+  border-color: var(--primary-1);
+  color: var(--primary-text);
   font-weight: 600;
 }
 .btn-primary:hover {
-  background: linear-gradient(180deg, #37d6b0, #23a488);
-  border-color: #37d6b0;
+  background: linear-gradient(180deg, var(--primary-hover-1), var(--primary-hover-2));
+  border-color: var(--primary-hover-1);
 }
 .btn-sm {
   padding: 5px 10px;
@@ -211,7 +296,7 @@ a:hover {
 }
 .input:hover,
 .select:hover {
-  border-color: #2c3742;
+  border-color: var(--input-hover-border);
 }
 .select {
   cursor: pointer;
@@ -228,4 +313,3 @@ input[type="range"] {
   width: 100%;
   accent-color: var(--accent);
 }
-

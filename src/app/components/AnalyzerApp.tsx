@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useDsp } from "@/lib/useDsp";
+import { useTheme } from "@/lib/useTheme";
 import type { AnalysisResult } from "@/core/analyze";
 import type { Waterfall } from "@/core/dsp";
 import type { AnalysisRequest } from "@/lib/types";
@@ -17,6 +18,7 @@ import a from "./app.module.css";
 
 export function AnalyzerApp() {
   const { process } = useDsp();
+  const { theme, toggle } = useTheme();
   const [request, setRequest] = useState<AnalysisRequest | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [waterfall, setWaterfall] = useState<Waterfall | null>(null);
@@ -64,7 +66,7 @@ export function AnalyzerApp() {
   const defectMarkers: Marker[] = result
     ? [
         { freq: result.defects.bpfo, label: "BPFO", color: "var(--zone-d)" },
-        { freq: result.defects.bpfi, label: "BPFI", color: "#ff7a85" },
+        { freq: result.defects.bpfi, label: "BPFI", color: "var(--bpfi)" },
         { freq: result.defects.bsf, label: "2×BSF", color: "var(--amber)" },
         { freq: result.defects.ftf, label: "FTF", color: "var(--violet)" },
       ]
@@ -98,6 +100,17 @@ export function AnalyzerApp() {
           <a className="tag" href="https://github.com/igorjba/auscult" target="_blank" rel="noreferrer">
             GitHub ↗
           </a>
+          <button
+            type="button"
+            className="btn btn-sm"
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro"}
+            title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+          >
+            <span aria-hidden suppressHydrationWarning>
+              {theme === "dark" ? "☀" : "☾"}
+            </span>
+          </button>
         </div>
       </header>
 
@@ -152,6 +165,7 @@ export function AnalyzerApp() {
                   xMax={velXMax}
                   unit="mm/s"
                   color="var(--accent)"
+                  theme={theme}
                 />
                 <div className={a.legend}>
                   <span className={a.legendItem}>
@@ -173,13 +187,14 @@ export function AnalyzerApp() {
                   markers={defectMarkers}
                   xMax={envXMax}
                   color="var(--amber)"
+                  theme={theme}
                 />
                 <div className={a.legend}>
                   <span className={a.legendItem}>
                     <span className={a.swatch} style={{ background: "var(--zone-d)" }} /> BPFO
                   </span>
                   <span className={a.legendItem}>
-                    <span className={a.swatch} style={{ background: "#ff7a85" }} /> BPFI
+                    <span className={a.swatch} style={{ background: "var(--bpfi)" }} /> BPFI
                   </span>
                   <span className={a.legendItem}>
                     <span className={a.swatch} style={{ background: "var(--amber)" }} /> 2×BSF
@@ -196,7 +211,7 @@ export function AnalyzerApp() {
                     <span className={a.chartTitle}>Waterfall (STFT)</span>
                     <span className={a.chartSub}>{waterfall.magnitudes.length} quadros</span>
                   </div>
-                  <WaterfallChart waterfall={waterfall} />
+                  <WaterfallChart waterfall={waterfall} theme={theme} />
                 </div>
               )}
             </>

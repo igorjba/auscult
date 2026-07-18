@@ -8,6 +8,13 @@ interface Props {
   waterfall: Waterfall;
   height?: number;
   markers?: { freq: number; label: string; color?: string }[];
+  /** Current theme; only used to force a repaint when it changes. */
+  theme?: string;
+}
+
+function readVar(name: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 }
 
 /**
@@ -15,7 +22,7 @@ interface Props {
  * Rendered by filling an offscreen bitmap at native resolution (one texel per
  * bin/frame) and letting the GPU scale it — fast enough to repaint on resize.
  */
-export function WaterfallChart({ waterfall, height = 240, markers = [] }: Props) {
+export function WaterfallChart({ waterfall, height = 240, markers = [], theme }: Readonly<Props>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
@@ -77,8 +84,8 @@ export function WaterfallChart({ waterfall, height = 240, markers = [] }: Props)
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(off, padL, padT, plotW, plotH);
 
-    // Axes.
-    ctx.fillStyle = "#8a97a5";
+    // Axes. Canvas can't read CSS variables; resolve the token per paint.
+    ctx.fillStyle = readVar("--text-faint", "#5f6b79");
     ctx.font = "10px var(--font-geist-mono), monospace";
     ctx.textAlign = "center";
     for (let t = 0; t <= 6; t++) {
@@ -95,7 +102,7 @@ export function WaterfallChart({ waterfall, height = 240, markers = [] }: Props)
     for (const m of markers) {
       if (m.freq > fMax) continue;
       const x = padL + (m.freq / fMax) * plotW;
-      ctx.strokeStyle = m.color ?? "rgba(255,255,255,0.5)";
+      ctx.strokeStyle = m.color ?? readVar("--crosshair", "rgba(20,30,45,0.42)");
       ctx.globalAlpha = 0.5;
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
@@ -105,7 +112,7 @@ export function WaterfallChart({ waterfall, height = 240, markers = [] }: Props)
       ctx.setLineDash([]);
       ctx.globalAlpha = 1;
     }
-  }, [waterfall, width, height, fMax, markers]);
+  }, [waterfall, width, height, fMax, markers, theme]);
 
   return (
     <div className={styles.wrap} ref={wrapRef}>

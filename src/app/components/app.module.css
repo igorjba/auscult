@@ -147,13 +147,13 @@
 }
 .truthOk {
   color: var(--zone-a);
-  border-color: rgba(63, 183, 104, 0.4);
-  background: rgba(63, 183, 104, 0.1);
+  border-color: var(--truth-ok-border);
+  background: var(--truth-ok-bg);
 }
 .truthMiss {
   color: var(--zone-d);
-  border-color: rgba(224, 82, 95, 0.4);
-  background: rgba(224, 82, 95, 0.1);
+  border-color: var(--truth-miss-border);
+  background: var(--truth-miss-bg);
 }
 
 .saveRow {

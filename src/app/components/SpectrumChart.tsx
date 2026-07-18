@@ -21,6 +21,8 @@ interface Props {
   yLabel?: string;
   unit?: string;
   height?: number;
+  /** Current theme; only used to force a repaint when it changes. */
+  theme?: string;
 }
 
 /**
@@ -39,7 +41,8 @@ export function SpectrumChart({
   yLabel = "Amplitude",
   unit = "",
   height = 220,
-}: Props) {
+  theme,
+}: Readonly<Props>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<{ x: number; freq: number; amp: number } | null>(null);
@@ -82,14 +85,20 @@ export function SpectrumChart({
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, height);
 
+    // Canvas can't read CSS variables, so resolve the theme tokens once per paint.
+    const gridColor = readVar("--grid", "rgba(20,30,45,0.06)");
+    const axisColor = readVar("--text-faint", "#5f6b79");
+    const crosshairColor = readVar("--crosshair", "rgba(20,30,45,0.42)");
+    const markerFallback = readVar("--amber", "#a8720f");
+
     const plotW = width - padL - padR;
     const plotH = height - padT - padB;
     const xOf = (f: number) => padL + (f / fMax) * plotW;
     const yOf = (v: number) => padT + plotH - (v / vMax) * plotH;
 
     // Grid.
-    ctx.strokeStyle = "rgba(255,255,255,0.05)";
-    ctx.fillStyle = "#8a97a5";
+    ctx.strokeStyle = gridColor;
+    ctx.fillStyle = axisColor;
     ctx.lineWidth = 1;
     ctx.font = "10px var(--font-geist-mono), monospace";
     ctx.textAlign = "center";
@@ -119,7 +128,7 @@ export function SpectrumChart({
     for (const m of markers) {
       if (m.freq > fMax || m.freq < 0) continue;
       const x = xOf(m.freq);
-      const mc = m.color ?? "#e5a94e";
+      const mc = m.color ? resolveColor(m.color) : markerFallback;
       ctx.strokeStyle = mc;
       ctx.globalAlpha = 0.55;
       ctx.setLineDash(m.dashed ? [3, 3] : []);
@@ -167,7 +176,7 @@ export function SpectrumChart({
 
     // Hover crosshair.
     if (hover) {
-      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.strokeStyle = crosshairColor;
       ctx.setLineDash([2, 2]);
       ctx.beginPath();
       ctx.moveTo(hover.x, padT);
@@ -180,7 +189,7 @@ export function SpectrumChart({
       ctx.arc(hover.x, y, 3, 0, Math.PI * 2);
       ctx.fill();
     }
-  }, [freqs, values, markers, color, fill, width, height, fMax, vMax, lastBin, hover, padB]);
+  }, [freqs, values, markers, color, fill, width, height, fMax, vMax, lastBin, hover, padB, theme]);
 
   function onMove(e: React.MouseEvent) {
     const canvas = canvasRef.current;
@@ -232,11 +241,13 @@ function formatAmp(v: number): string {
   if (abs >= 0.01) return v.toFixed(3);
   return v.toExponential(1);
 }
+function readVar(name: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
 function resolveColor(c: string): string {
   if (!c.startsWith("var(")) return c;
-  const name = c.slice(4, -1).trim();
-  if (typeof window === "undefined") return "#38d6b0";
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#38d6b0";
+  return readVar(c.slice(4, -1).trim(), "#0a8367");
 }
 function hexA(hex: string, a: number): string {
   const m = hex.replace("#", "");

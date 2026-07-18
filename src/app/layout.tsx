@@ -12,9 +12,16 @@ export const metadata: Metadata = {
   keywords: ["vibracao", "FFT", "envelope", "rolamento", "BPFO", "ISO 20816", "manutencao preditiva"],
 };
 
+// Applies the saved theme before first paint so there is no flash of the wrong one.
+// Light is the default when nothing is stored.
+const themeScript = `try{var t=localStorage.getItem('auscult-theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

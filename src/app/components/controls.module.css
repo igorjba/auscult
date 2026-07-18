@@ -82,7 +82,7 @@
 }
 .cwruCard:hover {
   border-color: var(--accent-dim);
-  background: #131c22;
+  background: var(--surface-hover);
 }
 .cwruId {
   font-family: var(--font-mono);
@@ -134,9 +134,9 @@
 .error {
   padding: 8px 12px;
   border-radius: var(--radius);
-  background: rgba(224, 82, 95, 0.12);
-  border: 1px solid rgba(224, 82, 95, 0.3);
-  color: #f2a3aa;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
   font-size: 12.5px;
 }
 
@@ -158,7 +158,7 @@
 }
 .caseLoad:hover {
   border-color: var(--accent-dim);
-  background: #131c22;
+  background: var(--surface-hover);
 }
 .caseActions {
   display: flex;
@@ -179,7 +179,7 @@
   transition: border-color 0.12s, background 0.12s, color 0.12s;
 }
 .iconBtn:hover {
-  border-color: #33414e;
-  background: #182029;
+  border-color: var(--border-hover);
+  background: var(--surface-hover);
   color: var(--text);
 }

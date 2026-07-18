@@ -112,11 +112,11 @@
   margin-top: 1px;
 }
 .evYes {
-  background: rgba(63, 183, 104, 0.15);
+  background: var(--ev-yes-bg);
   color: var(--zone-a);
 }
 .evNo {
-  background: rgba(90, 104, 117, 0.15);
+  background: var(--ev-no-bg);
   color: var(--text-faint);
 }
 
