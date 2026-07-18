@@ -92,7 +92,7 @@ export function AnalyzerApp() {
             />
           </svg>
           <div className={a.brandText}>
-            <h1>auscult</h1>
+            <h1>Auscult</h1>
             <p>Diagnostico espectral de maquinas rotativas</p>
           </div>
         </div>
