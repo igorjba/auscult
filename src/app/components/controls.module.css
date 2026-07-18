@@ -1,0 +1,134 @@
+.panel {
+  background: linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  padding: 3px;
+  background: var(--bg-inset);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.tab {
+  padding: 7px 8px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: background 0.12s, color 0.12s;
+}
+.tab:hover {
+  color: var(--text);
+}
+.tabActive {
+  background: var(--bg-panel-2);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.grid1 {
+  display: grid;
+  gap: 10px;
+}
+
+.sliderRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sliderHead {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.sliderVal {
+  color: var(--accent);
+}
+
+.cwruGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.cwruCard {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--bg-inset);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.cwruCard:hover {
+  border-color: var(--accent-dim);
+  background: #131c22;
+}
+.cwruId {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.cwruLabel {
+  font-size: 13px;
+  font-weight: 550;
+  margin-top: 2px;
+}
+.cwruMeta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+  margin-top: 3px;
+}
+
+.dropzone {
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 22px 14px;
+  text-align: center;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.dropzone:hover {
+  border-color: var(--accent-dim);
+  background: var(--bg-inset);
+}
+.hint {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  line-height: 1.5;
+}
+.divider {
+  height: 1px;
+  background: var(--line-soft);
+  margin: 2px 0;
+}
+.error {
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: rgba(224, 82, 95, 0.12);
+  border: 1px solid rgba(224, 82, 95, 0.3);
+  color: #f2a3aa;
+  font-size: 12.5px;
+}

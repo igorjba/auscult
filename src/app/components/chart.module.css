@@ -1,0 +1,52 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  background: var(--bg-inset);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 4px 4px 2px;
+}
+
+.wrap canvas {
+  display: block;
+}
+
+.yaxis {
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: rotate(-90deg) translateX(50%);
+  transform-origin: left center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.xaxis {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 2px 0 4px;
+}
+
+.readout {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  display: flex;
+  gap: 12px;
+  padding: 4px 10px;
+  background: rgba(8, 12, 16, 0.85);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 12px;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
