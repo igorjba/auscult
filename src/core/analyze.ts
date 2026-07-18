@@ -18,10 +18,11 @@ import {
   bandpass,
   analyticSignal,
   instantaneousPhase,
+  prevPowerOfTwo,
   type Spectrum,
   type WindowType,
 } from "./dsp";
-import { findBearing, defectFrequencies, type BearingSpec, type BearingGeometry } from "./bearings";
+import { resolveBearing, defectFrequencies, type BearingSpec, type BearingGeometry } from "./bearings";
 import { diagnose, type DiagnosisResult } from "./diagnosis/rules";
 import { classifySeverity, type SeverityAssessment, type MachineGroup, type Foundation } from "./diagnosis/severity";
 
@@ -57,14 +58,10 @@ export interface AnalysisResult {
   shaftRate: number;
 }
 
-const LARGEST_POW2 = (n: number) => (n < 2 ? 1 : 1 << Math.floor(Math.log2(n)));
-
 export function analyze(input: AnalysisInput): AnalysisResult {
   const { samples, sampleRate: fs, rpm, unit } = input;
   const shaftRate = rpm / 60;
-  const bearing: BearingSpec = input.bearingGeometry
-    ? { designation: "Personalizado", manufacturer: "—", description: "Geometria personalizada", geometry: input.bearingGeometry }
-    : findBearing(input.bearingDesignation ?? "6205-2RS JEM SKF") ?? findBearing("6205-2RS JEM SKF")!;
+  const bearing = resolveBearing(input.bearingDesignation, input.bearingGeometry);
   const defects = defectFrequencies(bearing, rpm);
 
   // Velocity signal (mm/s) for the amplitude spectrum and ISO severity.
@@ -87,17 +84,11 @@ export function analyze(input: AnalysisInput): AnalysisResult {
     velocity = Float64Array.from(samples);
   }
 
-  const nWin = Math.min(LARGEST_POW2(samples.length), 1 << 15);
-  const displaySpectrum = amplitudeSpectrum(
-    Float64Array.prototype.slice.call(unit === "acceleration" ? samples : velocity, 0, nWin),
-    fs,
-    input.windowType ?? "hann",
-  );
-  const velocitySpectrum = amplitudeSpectrum(
-    Float64Array.prototype.slice.call(velocity, 0, nWin),
-    fs,
-    input.windowType ?? "hann",
-  );
+  const nWin = Math.min(prevPowerOfTwo(samples.length), 1 << 15);
+  const window = input.windowType ?? "hann";
+  const displayInput = unit === "acceleration" ? samples : velocity;
+  const displaySpectrum = amplitudeSpectrum(displayInput.slice(0, nWin), fs, window);
+  const velocitySpectrum = amplitudeSpectrum(velocity.slice(0, nWin), fs, window);
 
   // ISO severity from broadband velocity RMS, 10–1000 Hz.
   const psd = welchPSD(velocity, fs, { segmentLength: Math.min(4096, nWin), overlap: 0.5 });

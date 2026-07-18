@@ -20,6 +20,11 @@ export function nextPowerOfTwo(n: number): number {
   return 1 << Math.ceil(Math.log2(n));
 }
 
+/** Largest power of two <= n. Used to pick the biggest radix-2 FFT that fits a record. */
+export function prevPowerOfTwo(n: number): number {
+  return n < 2 ? 1 : 1 << Math.floor(Math.log2(n));
+}
+
 /** In-place radix-2 FFT. `re`/`im` length must be a power of two. */
 function fftRadix2(re: Float64Array, im: Float64Array, inverse: boolean): void {
   const n = re.length;

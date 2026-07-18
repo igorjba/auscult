@@ -19,7 +19,7 @@
  * so a case is exactly reproducible.
  */
 
-import { defectFrequencies, findBearing, type BearingSpec, type BearingGeometry } from "../bearings";
+import { defectFrequencies, resolveBearing, type BearingGeometry } from "../bearings";
 
 export type FaultType =
   | "healthy"
@@ -126,13 +126,7 @@ export function generateSignal(config: GeneratorConfig): GeneratedSignal {
     shaftPhase[i] = phase;
   }
 
-  // Resolve a bearing: custom geometry first, then catalogue lookup, always with a
-  // safe fallback so an unknown designation (e.g. "custom" with no geometry) can
-  // never leave `bearing` undefined and crash the impact model.
-  const bearing: BearingSpec =
-    (config.bearingGeometry
-      ? { designation: "Personalizado", manufacturer: "—", description: "Geometria personalizada", geometry: config.bearingGeometry }
-      : findBearing(config.bearingDesignation ?? "6205-2RS JEM SKF")) ?? findBearing("6205-2RS JEM SKF")!;
+  const bearing = resolveBearing(config.bearingDesignation, config.bearingGeometry);
 
   let defectHz: number | undefined;
 

@@ -4,6 +4,7 @@ import { makeWindow } from "./window";
 import { amplitudeSpectrum, welchPSD, findPeaks, bandRMS } from "./spectrum";
 import { analyticSignal, envelope, instantaneousFrequency } from "./hilbert";
 import { envelopeAnalysis, kurtosis } from "./envelope";
+import { integrateToVelocity } from "./integrate";
 
 function sine(freq: number, amp: number, fs: number, n: number, phase = 0): Float64Array {
   const x = new Float64Array(n);
@@ -174,6 +175,34 @@ describe("hilbert / envelope", () => {
     for (let i = 500; i < n - 500; i++) mean += f[i];
     mean /= n - 1000;
     expect(mean).toBeCloseTo(100, 0);
+  });
+});
+
+describe("integration acceleration -> velocity", () => {
+  it("scales a tone by 1/omega and shifts phase", () => {
+    // For a = A·sin(2πft), velocity amplitude is A/(2πf).
+    const fs = 4096;
+    const n = fs * 2;
+    const f = 80;
+    const amp = 3;
+    const accel = sine(f, amp, fs, n);
+    const vel = integrateToVelocity(accel, fs, { highpassHz: 5 });
+    const spec = amplitudeSpectrum(vel.slice(0, 8192), fs, "flattop");
+    const peak = findPeaks(spec.freqs, spec.amplitude, { count: 1 })[0];
+    expect(peak.freq).toBeCloseTo(f, 0);
+    expect(peak.amplitude).toBeCloseTo(amp / (2 * Math.PI * f), 2);
+  });
+
+  it("rejects low-frequency drift below the high-pass corner", () => {
+    const fs = 2048;
+    const n = fs * 2;
+    const signal = new Float64Array(n);
+    for (let i = 0; i < n; i++) signal[i] = Math.sin((2 * Math.PI * 40 * i) / fs) + 2 * Math.sin((2 * Math.PI * 1 * i) / fs);
+    const vel = integrateToVelocity(signal, fs, { highpassHz: 5 });
+    const spec = amplitudeSpectrum(vel.slice(0, 4096), fs, "hann");
+    // The 1 Hz drift (below 5 Hz corner) must be suppressed relative to the 40 Hz line.
+    const at = (hz: number) => spec.amplitude[Math.round(hz / spec.freqResolution)];
+    expect(at(40)).toBeGreaterThan(at(1) * 5);
   });
 });
 

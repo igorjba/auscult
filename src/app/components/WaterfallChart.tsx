@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { Waterfall } from "@/core/dsp";
 import styles from "./chart.module.css";
+import { useElementWidth, readVar, formatHz } from "./chartUtils";
 
 interface Props {
   waterfall: Waterfall;
@@ -12,11 +13,6 @@ interface Props {
   theme?: string;
 }
 
-function readVar(name: string, fallback: string): string {
-  if (typeof window === "undefined") return fallback;
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-}
-
 /**
  * Spectrogram of the run/record: frequency across, time down, amplitude as colour.
  * Rendered by filling an offscreen bitmap at native resolution (one texel per
@@ -24,17 +20,7 @@ function readVar(name: string, fallback: string): string {
  */
 export function WaterfallChart({ waterfall, height = 240, markers = [], theme }: Readonly<Props>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(600);
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => setWidth(entries[0].contentRect.width));
-    ro.observe(el);
-    setWidth(el.clientWidth);
-    return () => ro.disconnect();
-  }, []);
+  const [wrapRef, width] = useElementWidth();
 
   const padL = 52;
   const padR = 14;
@@ -90,7 +76,7 @@ export function WaterfallChart({ waterfall, height = 240, markers = [], theme }:
     ctx.textAlign = "center";
     for (let t = 0; t <= 6; t++) {
       const f = (fMax * t) / 6;
-      ctx.fillText(f >= 1000 ? `${(f / 1000).toFixed(1)}k` : f.toFixed(0), padL + (f / fMax) * plotW, height - 9);
+      ctx.fillText(formatHz(f), padL + (f / fMax) * plotW, height - 9);
     }
     ctx.textAlign = "right";
     const tMax = waterfall.times[waterfall.times.length - 1] ?? 1;

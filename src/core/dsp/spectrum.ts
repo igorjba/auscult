@@ -7,7 +7,7 @@
  * bandwidth and must be normalised out.
  */
 
-import { rfft } from "./fft";
+import { rfft, prevPowerOfTwo } from "./fft";
 import { applyWindow, makeWindow, type Window, type WindowType } from "./window";
 
 export interface Spectrum {
@@ -73,7 +73,7 @@ export function welchPSD(
   options: { segmentLength?: number; overlap?: number; windowType?: WindowType } = {},
 ): PSD {
   const nTotal = signal.length;
-  const segLen = Math.min(options.segmentLength ?? 4096, nextPow2Floor(nTotal));
+  const segLen = Math.min(options.segmentLength ?? 4096, prevPowerOfTwo(nTotal));
   const overlap = options.overlap ?? 0.5;
   const step = Math.max(1, Math.floor(segLen * (1 - overlap)));
   const window = makeWindow(options.windowType ?? "hann", segLen);
@@ -99,14 +99,10 @@ export function welchPSD(
   }
   if (segments === 0) {
     // Signal shorter than one segment: single periodogram over what we have.
-    return welchPSD(signal, sampleRate, { ...options, segmentLength: nextPow2Floor(nTotal) });
+    return welchPSD(signal, sampleRate, { ...options, segmentLength: prevPowerOfTwo(nTotal) });
   }
   for (let i = 0; i < half; i++) acc[i] /= segments;
   return { freqs: makeFreqs(segLen, sampleRate), psd: acc, freqResolution: sampleRate / segLen, sampleRate };
-}
-
-function nextPow2Floor(n: number): number {
-  return n < 2 ? 1 : 1 << Math.floor(Math.log2(n));
 }
 
 export interface Peak {

@@ -199,3 +199,17 @@ export const BEARING_CATALOG: BearingSpec[] = [
 export function findBearing(designation: string): BearingSpec | undefined {
   return BEARING_CATALOG.find((b) => b.designation === designation);
 }
+
+export const DEFAULT_BEARING = "6205-2RS JEM SKF";
+
+/**
+ * Resolve a bearing for the pipeline: a supplied custom geometry wins, otherwise the
+ * catalogue is looked up by designation, always falling back to the default so an
+ * unknown/absent designation can never leave the caller without a spec.
+ */
+export function resolveBearing(designation?: string, geometry?: BearingGeometry): BearingSpec {
+  if (geometry) {
+    return { designation: "Personalizado", manufacturer: "—", description: "Geometria personalizada", geometry };
+  }
+  return findBearing(designation ?? DEFAULT_BEARING) ?? findBearing(DEFAULT_BEARING)!;
+}

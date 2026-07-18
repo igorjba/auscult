@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import styles from "./chart.module.css";
+import { useElementWidth, readVar, resolveColor, formatHz, hexA } from "./chartUtils";
 
 export interface Marker {
   freq: number;
@@ -44,18 +45,8 @@ export function SpectrumChart({
   theme,
 }: Readonly<Props>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const [wrapRef, width] = useElementWidth();
   const [hover, setHover] = useState<{ x: number; freq: number; amp: number } | null>(null);
-  const [width, setWidth] = useState(600);
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => setWidth(entries[0].contentRect.width));
-    ro.observe(el);
-    setWidth(el.clientWidth);
-    return () => ro.disconnect();
-  }, []);
 
   const padL = 52;
   const padR = 14;
@@ -229,10 +220,6 @@ export function SpectrumChart({
   );
 }
 
-function formatHz(f: number): string {
-  if (f >= 1000) return `${(f / 1000).toFixed(f >= 10000 ? 0 : 1)}k`;
-  return f.toFixed(f < 10 ? 1 : 0);
-}
 function formatAmp(v: number): string {
   if (v === 0) return "0";
   const abs = Math.abs(v);
@@ -240,19 +227,4 @@ function formatAmp(v: number): string {
   if (abs >= 1) return v.toFixed(1);
   if (abs >= 0.01) return v.toFixed(3);
   return v.toExponential(1);
-}
-function readVar(name: string, fallback: string): string {
-  if (typeof window === "undefined") return fallback;
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-}
-function resolveColor(c: string): string {
-  if (!c.startsWith("var(")) return c;
-  return readVar(c.slice(4, -1).trim(), "#0a8367");
-}
-function hexA(hex: string, a: number): string {
-  const m = hex.replace("#", "");
-  const r = parseInt(m.slice(0, 2), 16);
-  const g = parseInt(m.slice(2, 4), 16);
-  const b = parseInt(m.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},${a})`;
 }
