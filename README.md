@@ -1,8 +1,16 @@
-# auscult
+# Auscult — Diagnóstico de vibração de máquinas rotativas no navegador
 
 Diagnóstico espectral de máquinas rotativas no navegador. Ingestão de sinal de vibração, FFT com janelamento, demodulação por envelope (Hilbert), cálculo das frequências de defeito de rolamento a partir da geometria, e um motor de diagnóstico de regra explícita com classificação de severidade por ISO 20816. Todo o processamento roda no cliente; o servidor não vê o sinal.
 
 Analisa sinais sintéticos com falha injetada, arquivos WAV/CSV/MAT enviados pelo usuário, e casos reais do dataset de rolamentos da Case Western Reserve University.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshot-light.png">
+  <img alt="Diagnóstico de defeito de pista externa (BPFO) sobre um registro real do CWRU — painel de diagnóstico, frequências de defeito, espectro de velocidade, espectro de envelope e waterfall" src="docs/screenshot-light.png">
+</picture>
+
+<p align="center"><em>Diagnóstico de defeito de pista externa (BPFO) sobre o registro real #130 do CWRU: o BPFO domina o espectro de envelope com sua série harmônica, e o resultado bate com o ground truth publicado.</em></p>
 
 ## O que faz
 
@@ -42,12 +50,12 @@ Acuracia: 100,0%  (n=72)
 
 Quatro registros de 12 kHz do mancal motriz (rolamento 6205, ~1797 rpm), com falha e tamanho conhecidos. O detector de envelope é rodado contra a verdade publicada pela universidade.
 
-| Arquivo | Falha real          | Tamanho    | Diagnóstico            |     |
-| ------- | ------------------- | ---------- | ---------------------- | --- |
-| 97      | Saudável (baseline) | —          | Saudável               | ✓   |
-| 105     | Pista interna       | 0,007 pol  | Pista interna          | ✓   |
-| 130     | Pista externa       | 0,007 pol  | Pista externa          | ✓   |
-| 118     | Esfera              | 0,007 pol  | Pista externa          | ✗   |
+| Arquivo | Falha real          | Tamanho   | Diagnóstico   |     |
+| ------- | ------------------- | --------- | ------------- | --- |
+| 97      | Saudável (baseline) | —         | Saudável      | ✓   |
+| 105     | Pista interna       | 0,007 pol | Pista interna | ✓   |
+| 130     | Pista externa       | 0,007 pol | Pista externa | ✓   |
+| 118     | Esfera              | 0,007 pol | Pista externa | ✗   |
 
 3 de 4. O defeito de esfera é o caso reconhecidamente difícil do dataset — sua energia se espalha e a linha 2×BSF raramente domina o envelope; a literatura reporta a menor taxa de acerto nessa classe. O detector ao menos o sinaliza como falha de rolamento, e não como máquina saudável.
 
@@ -57,16 +65,16 @@ A verificação de geometria de rolamento também é testada: as ordens derivada
 
 As regras são físicas e legíveis, pontuadas por razões (invariantes à escala) para a forma e por amplitude absoluta para o nível:
 
-| Assinatura                                                | Diagnóstico      |
-| --------------------------------------------------------- | ---------------- |
-| 1× grande e dominante, fase estável, poucas harmônicas    | Desbalanceamento |
-| 2× comparável ou acima de 1× + série harmônica            | Desalinhamento   |
-| série longa de harmônicas de 1× + meia-ordem              | Folga mecânica   |
-| linha de BPFO dominante no envelope + harmônicas          | Pista externa    |
-| BPFI dominante + bandas laterais de 1×                    | Pista interna    |
-| 2×BSF dominante + bandas laterais da gaiola               | Esfera           |
-| banda larga plana em 500 Hz–5 kHz, sem linha discreta     | Cavitação        |
-| linha subsíncrona proeminente em 0,42–0,48×               | Whirl de óleo    |
+| Assinatura                                             | Diagnóstico      |
+| ------------------------------------------------------ | ---------------- |
+| 1× grande e dominante, fase estável, poucas harmônicas | Desbalanceamento |
+| 2× comparável ou acima de 1× + série harmônica         | Desalinhamento   |
+| série longa de harmônicas de 1× + meia-ordem           | Folga mecânica   |
+| linha de BPFO dominante no envelope + harmônicas       | Pista externa    |
+| BPFI dominante + bandas laterais de 1×                 | Pista interna    |
+| 2×BSF dominante + bandas laterais da gaiola            | Esfera           |
+| banda larga plana em 500 Hz–5 kHz, sem linha discreta  | Cavitação        |
+| linha subsíncrona proeminente em 0,42–0,48×            | Whirl de óleo    |
 
 Discriminadores-chave: a **curtose da banda de ressonância** separa fenômeno impulsivo (rolamento) de não-impulsivo; a **prominência e a dominância relativa** da linha de defeito no envelope separam falha real de pico de ruído e nomeiam o elemento defeituoso; a **amplitude absoluta** separa máquina saudável de falha.
 
