@@ -43,9 +43,15 @@ export function parseWav(buffer: ArrayBuffer, name = "wav"): ParsedSignal {
     offset += 8 + chunkSize + (chunkSize % 2); // chunks are word-aligned
   }
   if (dataOffset < 0 || sampleRate === 0) throw new Error("WAV sem chunk de dados");
+  if (numChannels < 1 || numChannels > 64) throw new Error("WAV com numero de canais invalido");
+  if (![8, 16, 24, 32, 64].includes(bitsPerSample)) throw new Error(`WAV: ${bitsPerSample} bits nao suportado`);
 
   const bytesPerSample = bitsPerSample / 8;
-  const frameCount = Math.floor(dataLength / (bytesPerSample * numChannels));
+  // Never trust the header's declared data length over what the file actually holds:
+  // a bloated value would drive frameCount past the buffer and read out of bounds.
+  const availableBytes = Math.max(0, view.byteLength - dataOffset);
+  const usableLength = Math.min(dataLength, availableBytes);
+  const frameCount = Math.floor(usableLength / (bytesPerSample * numChannels));
   const out = new Float64Array(frameCount);
   const isFloat = audioFormat === 3;
 

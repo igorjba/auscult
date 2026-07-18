@@ -7,6 +7,7 @@ import { parseMat, extractCwru } from "@/core/signal/mat";
 import { BEARING_CATALOG, type BearingGeometry } from "@/core/bearings";
 import { WINDOW_LABELS, type WindowType } from "@/core/dsp";
 import { CWRU_CASES } from "@/core/validation/cwru";
+import { assertFileSize, assertSampleCount } from "@/lib/limits";
 import type { AnalysisRequest } from "@/lib/types";
 import s from "./controls.module.css";
 
@@ -107,17 +108,22 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
     if (!file) return;
     setError(null);
     try {
+      assertFileSize(file.size);
       const ext = file.name.toLowerCase().split(".").pop();
+      const label = file.name.slice(0, 120);
       if (ext === "wav") {
-        const parsed = parseWav(await file.arrayBuffer(), file.name);
-        dispatch({ samples: parsed.samples, sampleRate: parsed.sampleRate, rpm: fileRpm, unit: fileUnit, accelInG: fileUnit === "acceleration", label: file.name });
+        const parsed = parseWav(await file.arrayBuffer(), label);
+        assertSampleCount(parsed.samples.length);
+        dispatch({ samples: parsed.samples, sampleRate: parsed.sampleRate, rpm: fileRpm, unit: fileUnit, accelInG: fileUnit === "acceleration", label });
       } else if (ext === "csv" || ext === "txt") {
         const parsed = parseCsv(await file.text(), { sampleRate: fileSampleRate });
+        assertSampleCount(parsed.samples.length);
         const sr = parsed.sampleRate > 1 ? parsed.sampleRate : fileSampleRate;
-        dispatch({ samples: parsed.samples, sampleRate: sr, rpm: fileRpm, unit: fileUnit, accelInG: fileUnit === "acceleration", label: file.name });
+        dispatch({ samples: parsed.samples, sampleRate: sr, rpm: fileRpm, unit: fileUnit, accelInG: fileUnit === "acceleration", label });
       } else if (ext === "mat") {
         const cw = extractCwru(parseMat(await file.arrayBuffer()));
-        dispatch({ samples: cw.samples, sampleRate: fileSampleRate, rpm: cw.rpm ?? fileRpm, unit: "acceleration", accelInG: true, label: file.name });
+        assertSampleCount(cw.samples.length);
+        dispatch({ samples: cw.samples, sampleRate: fileSampleRate, rpm: cw.rpm ?? fileRpm, unit: "acceleration", accelInG: true, label });
       } else {
         setError("Formato nao suportado. Use WAV, CSV ou MAT.");
       }

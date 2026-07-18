@@ -12,6 +12,13 @@
 
 import { inflateSync } from "fflate";
 
+// Hard ceiling on how much a single compressed block may inflate to. A malicious or
+// corrupt MAT file can carry a zlib "decompression bomb" — a few KB that expand to
+// gigabytes and exhaust the tab's memory. fflate stops writing once the provided
+// output buffer is full, so a bounded buffer caps the allocation regardless of what
+// the stream claims to contain. 128 MB comfortably fits any real vibration record.
+const MAX_INFLATED_BYTES = 128 * 1024 * 1024;
+
 const MI_INT8 = 1;
 const MI_UINT8 = 2;
 const MI_INT16 = 3;
@@ -45,8 +52,14 @@ export function parseMat(buffer: ArrayBuffer): Record<string, MatVariable> {
   while (offset + 8 <= view.byteLength) {
     const { type, size, dataStart, next } = readTag(view, offset, little);
     if (type === MI_COMPRESSED) {
+      if (dataStart + size > view.byteLength) throw new Error("MAT: bloco comprimido excede o arquivo");
       const compressed = new Uint8Array(buffer, dataStart, size);
-      const inflated = inflateSync(compressed);
+      // Bound the output: ~40x the compressed size (real records barely compress),
+      // clamped to the hard ceiling. If the result fills the buffer, treat it as a
+      // decompression bomb rather than parse truncated data.
+      const cap = Math.min(MAX_INFLATED_BYTES, Math.max(size * 40, 8 * 1024 * 1024));
+      const inflated = inflateSync(compressed, { out: new Uint8Array(cap) });
+      if (inflated.length >= cap) throw new Error("MAT: bloco descomprimido excede o limite (arquivo corrompido ou malicioso)");
       const dv = new DataView(inflated.buffer, inflated.byteOffset, inflated.byteLength);
       const v = readMatrix(dv, 0, little);
       if (v) variables[v.name] = v;
@@ -122,6 +135,10 @@ function readNumericArray(view: DataView, tag: Tag, little: boolean): Float64Arr
   if (!r) return null;
   const [bytes, read] = r;
   const count = Math.floor(size / bytes);
+  // Validate the extent against the buffer before allocating: a malformed tag can
+  // declare a huge `size` while the data isn't there, which would otherwise allocate
+  // a multi-gigabyte typed array before the first out-of-bounds read threw.
+  if (dataStart + count * bytes > view.byteLength) throw new Error("MAT: elemento numerico excede os limites do arquivo");
   const out = new Float64Array(count);
   for (let i = 0; i < count; i++) out[i] = read(dataStart + i * bytes);
   return out;

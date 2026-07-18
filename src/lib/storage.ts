@@ -7,6 +7,7 @@
 
 import type { FaultType } from "@/core/signal/generator";
 import type { SignalUnit } from "@/core/analyze";
+import { assertSampleCount } from "./limits";
 
 const DB_NAME = "auscult";
 const STORE = "cases";
@@ -74,10 +75,49 @@ export function exportCase(c: StoredCase): string {
   return JSON.stringify(c, null, 2);
 }
 
+const UNITS: SignalUnit[] = ["velocity", "acceleration", "displacement"];
+
+/**
+ * Parse an imported case JSON into a clean, validated StoredCase. A case file can
+ * come from anywhere, so nothing from it is trusted: fields are type-checked and a
+ * fresh object is built (never the parsed input), so unexpected or prototype-polluting
+ * keys can't ride along, and an oversized or non-numeric sample array is rejected
+ * before it reaches storage or the worker.
+ */
 export function importCase(json: string): StoredCase {
-  const parsed = JSON.parse(json) as StoredCase;
-  if (!parsed.id || !Array.isArray(parsed.samples)) throw new Error("Caso invalido");
-  return parsed;
+  const p = JSON.parse(json) as Record<string, unknown>;
+  if (!p || typeof p !== "object") throw new Error("Caso invalido");
+  if (!Array.isArray(p.samples)) throw new Error("Caso sem amostras");
+  assertSampleCount(p.samples.length);
+
+  const samples = p.samples.map((v) => {
+    const n = Number(v);
+    if (!Number.isFinite(n)) throw new Error("Amostra nao numerica no caso importado");
+    return n;
+  });
+
+  const str = (v: unknown, fallback: string) => (typeof v === "string" ? v.slice(0, 200) : fallback);
+  const posNum = (v: unknown, fallback: number) => (typeof v === "number" && Number.isFinite(v) && v > 0 ? v : fallback);
+  const d = (p.diagnosis ?? {}) as Record<string, unknown>;
+
+  return {
+    id: str(p.id, newId()) || newId(),
+    name: str(p.name, "Caso importado"),
+    createdAt: typeof p.createdAt === "number" && Number.isFinite(p.createdAt) ? p.createdAt : Date.now(),
+    source: str(p.source, "importado"),
+    sampleRate: posNum(p.sampleRate, 12000),
+    rpm: posNum(p.rpm, 1797),
+    unit: UNITS.includes(p.unit as SignalUnit) ? (p.unit as SignalUnit) : "acceleration",
+    accelInG: p.accelInG === true,
+    bearingDesignation: str(p.bearingDesignation, "6205-2RS JEM SKF"),
+    samples,
+    diagnosis: {
+      fault: str(d.fault, "healthy") as FaultType,
+      score: typeof d.score === "number" && Number.isFinite(d.score) ? d.score : 0,
+      zone: str(d.zone, "A"),
+      velocityRms: typeof d.velocityRms === "number" && Number.isFinite(d.velocityRms) ? d.velocityRms : 0,
+    },
+  };
 }
 
 export function newId(): string {
