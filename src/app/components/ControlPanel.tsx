@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { generateSignal, FAULT_LABELS, type FaultType } from "@/core/signal/generator";
 import { parseWav, parseCsv } from "@/core/signal/parsers";
 import { parseMat, extractCwru } from "@/core/signal/mat";
-import { BEARING_CATALOG } from "@/core/bearings";
+import { BEARING_CATALOG, type BearingGeometry } from "@/core/bearings";
 import { WINDOW_LABELS, type WindowType } from "@/core/dsp";
 import { CWRU_CASES } from "@/core/validation/cwru";
 import type { AnalysisRequest } from "@/lib/types";
@@ -46,6 +46,13 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
 
   // Analysis params (shared).
   const [bearing, setBearing] = useState("6205-2RS JEM SKF");
+  const [customGeo, setCustomGeo] = useState<BearingGeometry>({
+    rollingElements: 8,
+    ballDiameter: 12,
+    pitchDiameter: 60,
+    contactAngle: 0,
+  });
+  const isCustom = bearing === "custom";
   const [windowType, setWindowType] = useState<WindowType>("hann");
   const [machineGroup, setMachineGroup] = useState<"group1" | "group2">("group2");
   const [foundation, setFoundation] = useState<"rigid" | "flexible">("rigid");
@@ -54,21 +61,23 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
   const lastSource = useRef<Omit<AnalysisRequest, "windowType" | "machineGroup" | "foundation" | "waterfall" | "bearingDesignation"> | null>(null);
 
+  const geometry = isCustom ? customGeo : undefined;
+
   const dispatch = useCallback(
     (src: Omit<AnalysisRequest, "windowType" | "machineGroup" | "foundation" | "waterfall" | "bearingDesignation">) => {
       lastSource.current = src;
-      onAnalyze({ ...src, bearingDesignation: bearing, windowType, machineGroup, foundation, waterfall });
+      onAnalyze({ ...src, bearingDesignation: bearing, bearingGeometry: geometry, windowType, machineGroup, foundation, waterfall });
     },
-    [onAnalyze, bearing, windowType, machineGroup, foundation, waterfall],
+    [onAnalyze, bearing, geometry, windowType, machineGroup, foundation, waterfall],
   );
 
   // Re-run when an analysis parameter changes and a signal is already loaded.
   useEffect(() => {
     if (lastSource.current) {
-      onAnalyze({ ...lastSource.current, bearingDesignation: bearing, windowType, machineGroup, foundation, waterfall });
+      onAnalyze({ ...lastSource.current, bearingDesignation: bearing, bearingGeometry: geometry, windowType, machineGroup, foundation, waterfall });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bearing, windowType, machineGroup, foundation, waterfall]);
+  }, [bearing, customGeo, windowType, machineGroup, foundation, waterfall]);
 
   function generate() {
     setError(null);
@@ -81,6 +90,7 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
       noise,
       seed: Math.floor(Math.random() * 1e6),
       bearingDesignation: bearing,
+      bearingGeometry: geometry,
     });
     dispatch({
       samples: sig.samples,
@@ -248,8 +258,60 @@ export function ControlPanel({ onAnalyze, busy }: Props) {
                 {b.designation}
               </option>
             ))}
+            <option value="custom">— Geometria personalizada —</option>
           </select>
         </div>
+
+        {isCustom && (
+          <div className={s.grid2}>
+            <div className="field">
+              <label>Elementos (Nb)</label>
+              <input
+                className="input"
+                type="number"
+                min={3}
+                max={40}
+                value={customGeo.rollingElements}
+                onChange={(e) => setCustomGeo({ ...customGeo, rollingElements: Number(e.target.value) })}
+              />
+            </div>
+            <div className="field">
+              <label>Ang. contato (°)</label>
+              <input
+                className="input"
+                type="number"
+                min={0}
+                max={45}
+                step={1}
+                value={Math.round((customGeo.contactAngle * 180) / Math.PI)}
+                onChange={(e) => setCustomGeo({ ...customGeo, contactAngle: (Number(e.target.value) * Math.PI) / 180 })}
+              />
+            </div>
+            <div className="field">
+              <label>Diam. esfera (mm)</label>
+              <input
+                className="input"
+                type="number"
+                min={1}
+                step={0.01}
+                value={customGeo.ballDiameter}
+                onChange={(e) => setCustomGeo({ ...customGeo, ballDiameter: Number(e.target.value) })}
+              />
+            </div>
+            <div className="field">
+              <label>Diam. primitivo (mm)</label>
+              <input
+                className="input"
+                type="number"
+                min={1}
+                step={0.01}
+                value={customGeo.pitchDiameter}
+                onChange={(e) => setCustomGeo({ ...customGeo, pitchDiameter: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+        )}
+
         <div className={s.grid2}>
           <div className="field">
             <label>Janela FFT</label>

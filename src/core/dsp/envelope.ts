@@ -101,6 +101,11 @@ export function envelopeAnalysis(
  * above 500 Hz into overlapping candidates, band-passes each, and scores it by the
  * kurtosis of the band-passed signal (Gaussian noise ~3; repetitive impacts push
  * it higher). The winning band is where a bearing defect is ringing.
+ *
+ * A finer multi-scale kurtogram was tried and rejected: it neither recovered the
+ * CWRU ball-defect case (whose energy simply does not concentrate on the BSF line
+ * in any band) nor helped the synthetic set, where the narrow bands it favours
+ * resolve the impact train less well than these half-octave-ish candidates.
  */
 export function selectResonanceBand(signal: ArrayLike<number>, sampleRate: number): [number, number] {
   const nyquist = sampleRate / 2;

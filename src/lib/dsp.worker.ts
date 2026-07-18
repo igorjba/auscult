@@ -8,6 +8,7 @@
 
 import { analyze, type AnalysisInput, type AnalysisResult } from "@/core/analyze";
 import { computeWaterfall, type Waterfall } from "@/core/dsp";
+import type { BearingGeometry } from "@/core/bearings";
 
 export interface ProcessRequest {
   id: number;
@@ -17,6 +18,7 @@ export interface ProcessRequest {
   unit: AnalysisInput["unit"];
   accelInG?: boolean;
   bearingDesignation?: string;
+  bearingGeometry?: BearingGeometry;
   windowType?: AnalysisInput["windowType"];
   resonanceBand?: [number, number];
   machineGroup?: AnalysisInput["machineGroup"];
@@ -42,6 +44,7 @@ self.onmessage = (e: MessageEvent<ProcessRequest>) => {
       unit: req.unit,
       accelInG: req.accelInG,
       bearingDesignation: req.bearingDesignation,
+      bearingGeometry: req.bearingGeometry,
       windowType: req.windowType,
       resonanceBand: req.resonanceBand,
       machineGroup: req.machineGroup,

@@ -1,5 +1,6 @@
 import type { SignalUnit, AnalysisInput } from "@/core/analyze";
 import type { FaultType } from "@/core/signal/generator";
+import type { BearingGeometry } from "@/core/bearings";
 
 /** A loaded signal plus everything needed to analyse and label it. */
 export interface AnalysisRequest {
@@ -9,6 +10,7 @@ export interface AnalysisRequest {
   unit: SignalUnit;
   accelInG?: boolean;
   bearingDesignation: string;
+  bearingGeometry?: BearingGeometry;
   windowType: NonNullable<AnalysisInput["windowType"]>;
   machineGroup: NonNullable<AnalysisInput["machineGroup"]>;
   foundation: NonNullable<AnalysisInput["foundation"]>;

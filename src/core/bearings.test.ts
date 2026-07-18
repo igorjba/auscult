@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { ordersFromGeometry, defectFrequencies, findBearing, defectOrders } from "./bearings";
+import { ordersFromGeometry, defectFrequencies, findBearing, defectOrders, BEARING_CATALOG } from "./bearings";
+import { generateSignal } from "./signal/generator";
+import { analyze } from "./analyze";
 
 describe("bearing kinematics", () => {
   it("derives the published CWRU factors for the 6205-2RS JEM SKF", () => {
@@ -34,4 +36,33 @@ describe("bearing kinematics", () => {
     expect(slipped.bpfo).toBeLessThan(nominal.bpfo);
     expect(slipped.bpfo / nominal.bpfo).toBeCloseTo(0.985, 3);
   });
+
+  it("derives self-consistent orders for every catalogue entry", () => {
+    for (const b of BEARING_CATALOG) {
+      const o = defectOrders(b);
+      expect(o.bpfo).toBeGreaterThan(0);
+      expect(o.bpfi).toBeGreaterThan(o.bpfo); // inner pass rate always exceeds outer
+      expect(o.ftf).toBeLessThan(0.5); // cage always turns slower than half shaft rate
+    }
+  });
+});
+
+describe("custom bearing geometry", () => {
+  it("generates and analyses a signal with a user-supplied geometry", () => {
+    // Regression: a custom geometry must flow through generation and analysis
+    // without falling back to a catalogue lookup that would return undefined.
+    const geometry = { rollingElements: 10, ballDiameter: 12.7, pitchDiameter: 70, contactAngle: 0 };
+    const sig = generateSignal({
+      fault: "bearing_outer",
+      rpm: 1800,
+      sampleRate: 25600,
+      duration: 1,
+      severity: 0.7,
+      bearingGeometry: geometry,
+      seed: 5,
+    });
+    const r = analyze({ samples: sig.samples, sampleRate: 25600, rpm: 1800, unit: "velocity", bearingGeometry: geometry });
+    expect(r.bearing.designation).toBe("Personalizado");
+    expect(r.diagnosis.top.fault).toBe("bearing_outer");
+  }, 15000);
 });

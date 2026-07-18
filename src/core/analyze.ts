@@ -21,7 +21,7 @@ import {
   type Spectrum,
   type WindowType,
 } from "./dsp";
-import { findBearing, defectFrequencies, type BearingSpec } from "./bearings";
+import { findBearing, defectFrequencies, type BearingSpec, type BearingGeometry } from "./bearings";
 import { diagnose, type DiagnosisResult } from "./diagnosis/rules";
 import { classifySeverity, type SeverityAssessment, type MachineGroup, type Foundation } from "./diagnosis/severity";
 
@@ -35,6 +35,8 @@ export interface AnalysisInput {
   /** g when unit is acceleration; ignored otherwise. */
   accelInG?: boolean;
   bearingDesignation?: string;
+  /** Custom bearing geometry; overrides the catalogue lookup when present. */
+  bearingGeometry?: BearingGeometry;
   resonanceBand?: [number, number];
   windowType?: WindowType;
   machineGroup?: MachineGroup;
@@ -60,7 +62,9 @@ const LARGEST_POW2 = (n: number) => (n < 2 ? 1 : 1 << Math.floor(Math.log2(n)));
 export function analyze(input: AnalysisInput): AnalysisResult {
   const { samples, sampleRate: fs, rpm, unit } = input;
   const shaftRate = rpm / 60;
-  const bearing = findBearing(input.bearingDesignation ?? "6205-2RS JEM SKF") ?? findBearing("6205-2RS JEM SKF")!;
+  const bearing: BearingSpec = input.bearingGeometry
+    ? { designation: "Personalizado", manufacturer: "—", description: "Geometria personalizada", geometry: input.bearingGeometry }
+    : findBearing(input.bearingDesignation ?? "6205-2RS JEM SKF") ?? findBearing("6205-2RS JEM SKF")!;
   const defects = defectFrequencies(bearing, rpm);
 
   // Velocity signal (mm/s) for the amplitude spectrum and ISO severity.

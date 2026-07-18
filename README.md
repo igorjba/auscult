@@ -8,7 +8,7 @@ Analisa sinais sintéticos com falha injetada, arquivos WAV/CSV/MAT enviados pel
 
 - **DSP** — FFT radix-2 com fallback de Bluestein para comprimentos arbitrários; janelas Hann, Hamming, Blackman-Harris e flat-top com correção de ganho de amplitude e de energia; PSD por Welch; transformada de Hilbert e sinal analítico; integração aceleração→velocidade no domínio da frequência.
 - **Análise de envelope** — banda de ressonância selecionada por curtose espectral, band-pass linear, demodulação Hilbert e espectro de envelope. É o que revela falha incipiente de rolamento, cuja assinatura está no *ritmo* dos impactos, não na ressonância que eles excitam.
-- **Frequências de defeito** — BPFO, BPFI, BSF e FTF derivadas da geometria do rolamento (número de elementos, diâmetros, ângulo de contato), com escorregamento. Catálogo com os rolamentos de teste do CWRU.
+- **Frequências de defeito** — BPFO, BPFI, BSF e FTF derivadas da geometria do rolamento (número de elementos, diâmetros, ângulo de contato), com escorregamento. Catálogo de rolamentos SKF (séries 6000/6200/6300, rolos cilíndricos e esféricos) e entrada de geometria personalizada para qualquer rolamento fora do catálogo.
 - **Order tracking** — reamostragem angular para máquinas de rotação variável, com fase do eixo por tacômetro ou estimada (tacho-less) via fase instantânea do 1×.
 - **Motor de diagnóstico** — regras explícitas e auditáveis (desbalanceamento, desalinhamento, folga, pista externa/interna/esfera, cavitação, whirl de óleo), cada hipótese acompanhada das evidências que a sustentam.
 - **Severidade** — RMS de velocidade em banda (10–1000 Hz) classificado nas zonas A/B/C/D da ISO 10816-3 / 20816-3.

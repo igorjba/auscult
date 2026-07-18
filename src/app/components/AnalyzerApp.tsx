@@ -36,6 +36,7 @@ export function AnalyzerApp() {
           unit: req.unit,
           accelInG: req.accelInG,
           bearingDesignation: req.bearingDesignation,
+          bearingGeometry: req.bearingGeometry,
           windowType: req.windowType,
           machineGroup: req.machineGroup,
           foundation: req.foundation,

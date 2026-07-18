@@ -19,7 +19,7 @@
  * so a case is exactly reproducible.
  */
 
-import { defectFrequencies, type BearingSpec, findBearing } from "../bearings";
+import { defectFrequencies, findBearing, type BearingSpec, type BearingGeometry } from "../bearings";
 
 export type FaultType =
   | "healthy"
@@ -52,6 +52,7 @@ export interface GeneratorConfig {
   severity?: number; // 0..1, defaults 0.6
   noise?: number; // background noise amplitude, defaults 0.05
   bearingDesignation?: string;
+  bearingGeometry?: BearingGeometry;
   resonance?: number; // structural resonance for bearing impacts, Hz
   slip?: number; // bearing slip fraction
   seed?: number;
@@ -125,9 +126,13 @@ export function generateSignal(config: GeneratorConfig): GeneratedSignal {
     shaftPhase[i] = phase;
   }
 
-  const bearing: BearingSpec | undefined = config.bearingDesignation
-    ? findBearing(config.bearingDesignation)
-    : findBearing("6205-2RS JEM SKF");
+  // Resolve a bearing: custom geometry first, then catalogue lookup, always with a
+  // safe fallback so an unknown designation (e.g. "custom" with no geometry) can
+  // never leave `bearing` undefined and crash the impact model.
+  const bearing: BearingSpec =
+    (config.bearingGeometry
+      ? { designation: "Personalizado", manufacturer: "—", description: "Geometria personalizada", geometry: config.bearingGeometry }
+      : findBearing(config.bearingDesignation ?? "6205-2RS JEM SKF")) ?? findBearing("6205-2RS JEM SKF")!;
 
   let defectHz: number | undefined;
 
@@ -178,7 +183,7 @@ export function generateSignal(config: GeneratorConfig): GeneratedSignal {
     case "bearing_outer":
     case "bearing_inner":
     case "bearing_ball": {
-      const freqs = defectFrequencies(bearing!, rpm, slip);
+      const freqs = defectFrequencies(bearing, rpm, slip);
       const map = { bearing_outer: freqs.bpfo, bearing_inner: freqs.bpfi, bearing_ball: freqs.bsf };
       defectHz = map[fault];
       addBearingImpacts(x, rng, { fs, defectHz, resonance, severity, fault, shaftRate: freqs.shaftRate, ftf: freqs.ftf });

@@ -105,16 +105,58 @@ export const BEARING_CATALOG: BearingSpec[] = [
     orderFactors: { ftf: 0.3817, bpfo: 3.053, bpfi: 4.9469, bsf: 1.8874 },
   },
   {
+    designation: "6004",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 20 mm, serie leve — geometria nominal",
+    geometry: { rollingElements: 9, ballDiameter: 6.35, pitchDiameter: 31.0, contactAngle: 0 },
+  },
+  {
+    designation: "6008",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 40 mm, serie leve — geometria nominal",
+    geometry: { rollingElements: 13, ballDiameter: 7.94, pitchDiameter: 54.0, contactAngle: 0 },
+  },
+  {
+    designation: "6204",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 20 mm — geometria nominal",
+    geometry: { rollingElements: 8, ballDiameter: 7.94, pitchDiameter: 33.5, contactAngle: 0 },
+  },
+  {
     designation: "6206",
     manufacturer: "SKF",
     description: "Rigido de esferas, furo 30 mm — geometria nominal",
     geometry: { rollingElements: 9, ballDiameter: 9.53, pitchDiameter: 46.0, contactAngle: 0 },
   },
   {
+    designation: "6207",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 35 mm — geometria nominal",
+    geometry: { rollingElements: 9, ballDiameter: 11.11, pitchDiameter: 53.5, contactAngle: 0 },
+  },
+  {
     designation: "6208",
     manufacturer: "SKF",
     description: "Rigido de esferas, furo 40 mm — geometria nominal",
     geometry: { rollingElements: 9, ballDiameter: 11.91, pitchDiameter: 60.0, contactAngle: 0 },
+  },
+  {
+    designation: "6210",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 50 mm — geometria nominal",
+    geometry: { rollingElements: 10, ballDiameter: 12.7, pitchDiameter: 70.0, contactAngle: 0 },
+  },
+  {
+    designation: "6305",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 25 mm, serie media — geometria nominal",
+    geometry: { rollingElements: 7, ballDiameter: 11.51, pitchDiameter: 44.6, contactAngle: 0 },
+  },
+  {
+    designation: "6307",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 35 mm, serie media — geometria nominal",
+    geometry: { rollingElements: 8, ballDiameter: 15.08, pitchDiameter: 58.5, contactAngle: 0 },
   },
   {
     designation: "6309",
@@ -129,10 +171,28 @@ export const BEARING_CATALOG: BearingSpec[] = [
     geometry: { rollingElements: 8, ballDiameter: 20.64, pitchDiameter: 88.0, contactAngle: 0 },
   },
   {
+    designation: "6316",
+    manufacturer: "SKF",
+    description: "Rigido de esferas, furo 80 mm, serie pesada — geometria nominal",
+    geometry: { rollingElements: 8, ballDiameter: 30.16, pitchDiameter: 125.0, contactAngle: 0 },
+  },
+  {
+    designation: "NU 208 ECP",
+    manufacturer: "SKF",
+    description: "Rolos cilindricos, furo 40 mm — geometria nominal",
+    geometry: { rollingElements: 12, ballDiameter: 10.0, pitchDiameter: 60.0, contactAngle: 0 },
+  },
+  {
     designation: "NU 2208 ECP",
     manufacturer: "SKF",
     description: "Rolos cilindricos, furo 40 mm — geometria nominal",
     geometry: { rollingElements: 14, ballDiameter: 11.0, pitchDiameter: 63.0, contactAngle: 0 },
+  },
+  {
+    designation: "22208 E",
+    manufacturer: "SKF",
+    description: "Rolos esfericos, furo 40 mm — geometria nominal",
+    geometry: { rollingElements: 14, ballDiameter: 12.0, pitchDiameter: 65.0, contactAngle: 0.17 },
   },
 ];
 
